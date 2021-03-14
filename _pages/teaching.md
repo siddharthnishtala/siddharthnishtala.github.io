@@ -2,10 +2,33 @@
 layout: page
 permalink: /teaching/
 title: teaching
-description: Materials for courses you taught. Replace this text with your description.
+description: A few courses that I helped teach.
 nav: true
 ---
 
-For now, this page is assumed to be a static description of your courses. You can convert it to a collection similar to `_projects/` so that you can have a dedicated page for each course.
+##### January 2021
+* Big Data Laboratory  
+*Taught at*: Department of Computer Science and Engineering, IIT Madras  
+*Intructors*: Rangarajan Vasudevan, Dr. Arun Rajkumar
+* Introduction to Machine Learning  
+*Taught at*: [Certificate Programme in
+Technology and Management](https://ctm-iitm.iimbx.edu.in)  
+*Intructors*: Prof. Balaraman Ravindran
 
-Organize your courses by years, topics, or universities, however you like!
+##### September 2020
+* Practical Machine Learning with TensorFlow ([website](https://onlinecourses.nptel.ac.in/noc20_cs95/preview))  
+*Taught at*: National Programme on Technology Enhanced Learning (NPTEL)  
+*Intructors*: Dr. Ashish Tendulkar, Prof. Balaraman Ravindran
+
+##### January 2020
+* Big Data Laboratory  
+*Taught at*: Department of Computer Science and Engineering, IIT Madras  
+*Intructors*: Rangarajan Vasudevan, Prof. Balaraman Ravindran
+* Practical Machine Learning with TensorFlow  
+*Taught at*: National Programme on Technology Enhanced Learning (NPTEL)  
+*Intructors*: Dr. Ashish Tendulkar, Prof. Balaraman Ravindran
+
+##### August 2020
+* Practical Machine Learning with TensorFlow  
+*Taught at*: National Programme on Technology Enhanced Learning (NPTEL)  
+*Intructors*: Dr. Ashish Tendulkar, Prof. Balaraman Ravindran
