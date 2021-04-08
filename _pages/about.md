@@ -21,4 +21,4 @@ I am currently working on a project in collaboration with Google AI and ARMMAN t
 
 My other interests include multi-task and meta learning.
 
-When I am not working, you will find me reading about Cricket or Formula 1. 
+When I am not working, you will find me reading about Cricket or Formula 1. Here are a few artists that I listen to: [Tool](https://open.spotify.com/artist/2yEwvVSSSUkcLeSTNyHKh8), [KGATWL](https://open.spotify.com/artist/6XYvaoDGE0VmRt83Jss9Sn), [PPC](https://open.spotify.com/artist/7GRrLcUxwtQLvOpO7OHO80), etc.
