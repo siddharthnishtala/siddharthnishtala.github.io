@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Data Refinement · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/post.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">home</a></li>
+      <li><a href="../blog.html" class="nav-link active">blog</a></li>
+      <li><a href="../publications.html" class="nav-link">publications</a></li>
+      <li><a href="../resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="post-main">
+    <div class="post-header">
+      <a href="../blog.html" class="back-link mono">← back to blog</a>
+      <div class="post-meta-header">
+        <span class="post-date mono">July 2025</span>
+        <div class="post-tags">
+          <span class="tag-pill">project</span>
+        </div>
+      </div>
+      <h1 class="post-heading">Market Data Refinement: A Backtesting Stack to Simulate Strategies for Indian Equities</h1>
+      <p class="post-lede">
+        Details and learnings from my attempt at building a backtesting stack to simulate different strategies for picking Indian stocks.
+      </p>
+    </div>
+
+    <article class="post-content">
+      <p>
+        If you’ve ever backtested a strategy on “historical data” and treated the result as truth, this project is my attempt to gently ruin that confidence.
+      </p>
+      <p>
+        I built market-data-refinement because I wanted to do two things properly:
+      </p>
+      <ul>
+        <li>trust my market data, and</li>
+        <li>trust the experiment loop built on top of it.</li>
+      </ul>
+      <p>
+        This became a full pipeline: ingestion, validation, correction, simulation, and analysis, all wired into a small web app so I can inspect every run like a lab notebook.
+      </p>
+
+      <p>
+        Most trading projects start with strategy ideas. This one starts with a less glamorous question: is my data even right?
+      </p>
+
+      <h2>The Problem I Wanted to Solve</h2>
+      <p>
+        Real-world market data is messy. Symbols get delisted or change, companies merge and demerge, APIs occasionally disagree with your stored candles, and “incremental updates” can quietly drift over time. 
+        A backtest built on that kind of drift is just a very fast departure from reality.
+      </p>
+
+      <p>
+        So I split the system into following parts:
+      </p>
+      <ul>
+        <li>DEX (data exchange/refinement layer): continuously tracks tradable NSE securities and daily OHLCV.</li>
+        <li>BATE (backtesting layer): runs configurable strategy simulations on refined data and stores reproducible run artifacts.</li>
+        <li>Frontend: the website makes results explorable, from high-level metrics down to single-trade candlestick drill-downs.</li>
+      </ul>
+
+      <p>
+        The daily orchestration is very simple: track tradables first, then update instruments and OHLCV.
+      </p>
+
+      <h2>What “Refinement” Means in Practice</h2>
+      <p>
+        The interesting part of this project is not fetching data. It’s verifying and healing it.
+        For each symbol, the updater does something I really like architecturally: it compares recent DB candles against fresh API candles before deciding how aggressive to be.
+      </p>
+      <ul>
+        <li>If no history exists, it bootstraps full history (from 2000 onward). This is very rare.</li>
+        <li>If recent history matches, it only inserts missing days. This is the most frequent scenario.</li>
+        <li>If there’s a mismatch on the latest day and only a small discrepancy, it patches just that day. This happens from time to time due to the quirks associted with the market data API.</li>
+        <li>If mismatches look broader, it drops and refetches the symbol’s full history. This occurs everytime a stock is split or a dividend is issued. The market data API adjusts all of the history based on the corporate action and hence, we need a full update.</li>
+      </ul>
+      <p>
+        That gives me a hybrid of incremental efficiency and full-refresh safety. It’s not perfect, but it’s explicit, inspectable, and way more robust than “append and pray.”
+      </p>
+      <p>
+        I applied the same philosophy to securities master data. The NSE sync doesn’t just overwrite rows — it logs field-level changes, versions daily snapshots, and marks delistings when symbols disappear from current feeds. That gives me a crude but useful “source-of-truth timeline” for instruments.
+      </p>
+
+      <h2>Backtesting Engine</h2>
+
+      <img src="../assets/img/posts/mdr/backtesting.png" style="width:100%; height:auto;">
+
+      <p>
+        Once data is reliable enough, I wanted strategy experimentation to be composable.
+        The backtester is built around a Strategy object that dynamically loads components from config:
+      </p>
+      <ul>
+        <li>universe selection</li>
+        <li>entry logic</li>
+        <li>exit logic</li>
+        <li>risk management</li>
+        <li>money management</li>
+        <li>ranking</li>
+      </ul>
+      <p>
+        Each bucket can combine multiple sub-strategies with union/intersection, which makes it easy to test ideas like:
+      </p>
+      <ul>
+        <li>strict intersection for high-conviction entries</li>
+        <li>union for broader opportunity sets</li>
+        <li>dedicated rankers when too many orders compete for limited capital</li>
+      </ul>
+      <p>
+        On execution, the simulator runs day-by-day and processes pending orders from the previous day first. 
+        Fill price is sampled between day low/high (to avoid magical close-price fills), and brokerage charges are explicitly modeled for both buy and sell paths.
+      </p>
+      <p>
+        Could this be more realistic with microstructure assumptions? Absolutely. But I’d rather start with a transparent approximation I can reason about than a “realistic” black box.
+      </p>
+
+      <h2>Observability</h2>
+      <p>
+        I didn’t want a system that only tells me CAGR and Sharpe at the end.
+      </p>
+      <p>
+        Every run writes a full artifact directory with config, metrics, portfolio history, trade logs, failed orders, and closed trades. This becomes a portable experiment snapshot. If a run looks suspicious, I can inspect exactly what happened without rerunning anything.
+      </p>
+      <p>
+        The Flask UI then turns these artifacts into something explorable:
+      </p>
+      <ul>
+        <li>list and compare runs</li>
+        <li>view backtest metrics and distributions</li>
+        <li>inspect best/worst trades</li>
+        <li>click into a trade and fetch surrounding OHLCV from Postgres to visualize entry/exit context</li>
+      </ul>
+
+      <img src="../assets/img/posts/mdr/trades.png" style="width:100%; height:auto;">
+
+      <p>
+        That last part is deceptively useful. It’s one thing to see a profitable trade in a CSV; it’s another to see where it sat inside actual price action.
+      </p>
+
+      <h2>Why I Built It This Way</h2>
+      <p>
+        I like systems that are boring in operation but rich in introspection. This project has a few explicit trade-offs:
+      </p>
+      <ul>
+        <li>Prefect for orchestration: extra complexity, but better retries and flow visibility</li>
+        <li>Postgres + filesystem split: DB holds refined market truth, filesystem holds run artifacts</li>
+        <li>Dynamic strategy loading: faster experimentation, but configuration discipline matters</li>
+        <li>Randomized intraday fill approximation: more honest than naive fills, less deterministic than pure close-to-close simulations</li>
+      </ul>
+      <p>
+        In short: I optimized for <em>iterating on ideas without lying to myself too much</em>.
+      </p>
+
+      <h2>What I Learned</h2>
+      <p>
+        Building this changed how I think about quant tooling.
+        The most important code wasn’t in indicators or models — it was in data quality checks, mismatch handling, version logs, and run traceability. That’s where confidence comes from.
+      </p>
+      <p>
+        Despite my best efforts, I could not solve for a few issues. The most important issue that the stocks that got delisted before I started my data pulls have no representation in my data. My existing market data API (from Zerodha) does not provide data on delisted companies as the moment. 
+        This means there will be a survivorship bias in the results. We could account for this to some degree by selecting the universe more carefully but that isn't ideal. Hopefully, such data is not behind a paywall and more easily available in the future.
+      </p>
+
+      <p>
+        If I had to summarize the project in one line:
+      </p>
+      <blockquote>
+        It’s a personal attempt to make backtesting feel less like storytelling and more like engineering.
+      </blockquote>
+
+      <p>
+        All in all, a fun project where I had to deal with data issues more than anything else. Hopefully, I can put this to use to make some money. But that is for another post. 
+      </p>
+
+      <p>
+        The code for the project can be found <a href="https://github.com/siddharthnishtala/market-data-refinement/" target="_blank">here</a>.
+      </p>
+
+    </article>
+
+    <div class="post-footer">
+      <a href="../blog.html" class="back-link mono">← all posts</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

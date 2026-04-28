@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>When Being Wrong Isn't Always the Same · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/post.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">home</a></li>
+      <li><a href="../blog.html" class="nav-link active">blog</a></li>
+      <li><a href="../publications.html" class="nav-link">publications</a></li>
+      <li><a href="../resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="post-main">
+    <div class="post-header">
+      <a href="../blog.html" class="back-link mono">← back to blog</a>
+      <div class="post-meta-header">
+        <span class="post-date mono">January 2024</span>
+        <div class="post-tags">
+          <span class="tag-pill">machine learning</span>
+          <span class="tag-pill">project</span>
+        </div>
+      </div>
+      <h1 class="post-heading">When Being Wrong Isn't Always the Same</h1>
+      <p class="post-lede">
+        On teaching decision trees to care about <em>how</em> they're wrong, not just <em>whether</em> they're wrong — and why that distinction quietly matters in reinforcement learning.
+      </p>
+    </div>
+
+    <article class="post-content">
+      <p>
+        There's a thought experiment I keep coming back to. Imagine you're in a car on a highway, and your self-driving system makes a mistake. It was supposed to brake, but instead it switches lanes. That's one kind of wrong. Now imagine the same situation, but instead it accelerates into the vehicle ahead. That's a very different kind of wrong.
+      </p>
+      <p>
+        Both are misclassifications. A standard machine learning classifier would treat them identically — one wrong prediction is one wrong prediction. But anyone with a pulse understands that these aren't the same thing at all.
+      </p>
+ 
+      <p>
+        This is the problem we went after in this paper, published at CODS-COMAD 2024. The setting is interpretable reinforcement learning — specifically, learning decision tree policies. And the fix, once you see it, feels almost obvious.
+      </p>
+ 
+      <h2>The Setup: Why Trees at All?</h2>
+ 
+      <p>
+        Neural networks make excellent RL agents. They handle complex environments, learn subtle patterns, and generalize well. But they're black boxes. If you're deploying an agent in healthcare, autonomous driving, or finance, "trust me, the network figured it out" is not a satisfying answer.
+      </p>
+ 
+      <p>
+        Decision trees are the opposite. They're human-readable. You can trace exactly why a prediction was made, verify the policy's behavior, and audit specific decisions. The catch is that they're hard to train directly with RL — the non-differentiability of trees makes gradient-based methods awkward.
+      </p>
+ 
+      <p>
+        The workaround that's become standard: train a neural network first, then use it as a <em>teacher</em> to distill a tree policy through imitation learning. Methods like VIPER and MoET do exactly this. You roll out the teacher, collect state-action pairs, and train a tree to mimic it. Repeat for a few iterations.
+      </p>
+ 
+      <p>
+        It works reasonably well. But there's a quiet assumption baked into the whole process that nobody had questioned.
+      </p>
+ 
+      <h2>The Hidden Assumption</h2>
+ 
+      <p>
+        When you train a tree to imitate a neural network, you're essentially solving a classification problem: given a state, predict the action the teacher would take. Standard classifiers minimize the number of wrong predictions. Every misclassification counts equally — one mistake is one mistake.
+      </p>
+ 
+      <p>
+        But in reinforcement learning, actions have Q-values. The teacher's Q-function tells you the expected cumulative reward of taking each action from each state. Which means you already have a way to measure how bad a wrong prediction actually is: it's the gap between the Q-value of the optimal action and the Q-value of whatever action you predicted instead.
+      </p>
+ 
+      <p>
+        Braking when you should've switched lanes: Q-gap is small, both actions lead to roughly similar outcomes. Accelerating into a bus: Q-gap is enormous, you've just chosen the worst possible action.
+      </p>
+ 
+      <p>
+        Standard tree learning doesn't know this. It sees two misclassifications and penalizes them identically. We thought: what if the tree knew?
+      </p>
+ 
+      <div class="callout-box">
+        <span class="mono callout-label">// the core idea</span>
+        <p>
+          Define the misclassification cost of predicting action <em>a</em> in state <em>s</em> as:
+          <br /><br />
+          <code>cost(s, a) = max_a' Q*(s, a') − Q*(s, a)</code>
+          <br /><br />
+          Zero for the optimal action. Large for catastrophically wrong ones. Use this during tree construction, not just at evaluation time.
+        </p>
+      </div>
+ 
+      <h2>Making Trees Cost-Sensitive</h2>
+ 
+      <p>
+        The mechanism we used is called an Example-Dependent Cost-Sensitive Decision Tree (EDCSDT). Unlike standard trees that split on features to minimize misclassification <em>rate</em>, EDCSDT splits to minimize misclassification <em>cost</em>. The impurity criterion changes from Gini/entropy to a cost-weighted measure, and at each leaf, the predicted action is whichever minimizes the total cost across all states in that leaf — not necessarily the plurality label.
+      </p>
+ 
+      <p>
+        We plugged this into both VIPER and MoET, giving us CS-VIPER and CS-MoET. In CS-MoET, there's an additional wrinkle: each expert tree in the mixture is also weighted by its "responsibility" for each training instance, so the cost-sensitive criterion gets scaled by how much that expert actually owns a given state. The math works out cleanly — the structure of the underlying policy (trees with axis-aligned splits) is identical, so all the verifiability properties carry over too.
+      </p>
+ 
+      <h2>What Actually Happened</h2>
+ 
+      <p>
+        We tested across four environments: LunarLander, Taxi, FourRooms, and a highway driving simulation. The results were cleaner than I expected.
+      </p>
+ 
+      <p>
+        The headline result from LunarLander: the best VIPER policy (at depth 11) hit a cumulative reward of 169.9, still well below the teacher's 207.2. CS-VIPER hit 203.2 at depth 9 — closer to the teacher, with a shallower tree. At depth 7, CS-VIPER already beat VIPER's all-time best.
+      </p>
+ 
+      <p>
+        The highway environment had a striking depth-1 result. A depth-1 tree can only ask one question. VIPER, optimizing for accuracy, learned to mostly predict "accelerate" — because that's the most common action in the dataset. It scored 8.6. CS-VIPER learned to mostly predict "brake" — because the teacher's Q-function assigns high value to cautious behavior. It scored 21.1. Same tree depth, same data, wildly different outcomes, because one method understood what mistakes cost.
+      </p>
+ 
+      <p>
+        There's one counterintuitive finding worth dwelling on. CS-VIPER and CS-MoET consistently achieve <em>lower fidelity</em> than their vanilla counterparts — meaning they match the teacher's exact action less often. But they accumulate higher reward. The lesson: imitating a teacher's actions as accurately as possible is not the same as learning to perform well. The Q-function gives you something richer than labels, and throwing that information away during tree construction is a mistake.
+      </p>
+ 
+      <h2>Looking at the Mistakes</h2>
+ 
+      <p>
+        We did a deeper analysis in Taxi — a gridworld where an agent picks up and drops off passengers. We ran both depth-7 policies on a shared set of states and looked at the distribution of misclassification costs.
+      </p>
+ 
+      <p>
+        Over 90% of CS-VIPER's mistakes had a cost below 1 — small navigational errors, taking a slightly suboptimal path, nothing catastrophic. VIPER's mistakes were spread across the range: most had costs of 1–3 (taking two extra steps to backtrack), and a small but painful fraction had costs around 10 — those were cases where the tree predicted an illegal drop-off action, triggering a −10 penalty.
+      </p>
+ 
+      <p>
+        CS-VIPER essentially learned to avoid the expensive mistakes, even at the cost of making more cheap ones. Which is exactly what you'd want.
+      </p>
+ 
+      <h2>Why This Matters</h2>
+ 
+      <p>
+        The broader point here is about what information you use and when. The Q-function has always been available — it's sitting right there, produced as a byproduct of training the teacher. VIPER uses it to weight which states to sample (states with higher Q-spread get sampled more). But then, during tree construction, it reverts to treating every misclassification equally. We're just saying: don't stop there.
+      </p>
+ 
+      <p>
+        In safety-critical domains, the distribution of your errors matters as much as the error rate. A model that gets 95% accuracy but makes catastrophic mistakes 5% of the time is very different from one with 93% accuracy and only benign mistakes in the tail. Cost-sensitivity is a way to push the former toward the latter.
+      </p>
+ 
+      <p>
+        There's plenty left to explore — how does this hold up with a weaker teacher policy? Can you incorporate uncertainty in the Q-estimates? What happens with continuous action spaces? But as a targeted intervention on a clean problem, I'm happy with how this turned out.
+      </p>
+ 
+      <div class="paper-callout">
+        <span class="mono">// paper</span>
+        <p>
+          <strong>Cost-Sensitive Trees for Interpretable Reinforcement Learning</strong><br />
+          Siddharth Nishtala &amp; Balaraman Ravindran<br />
+          CODS-COMAD 2024 · IIT Madras
+        </p>
+        <div class="pub-links">
+          <a href="https://doi.org/10.1145/3632410.3632443" target="_blank" class="pub-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            ACM DL
+          </a>
+          <a href="https://github.com/siddharthnishtala/cost-sensitive-trees-rl" target="_blank" class="pub-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+            code
+          </a>
+          <a href="../publications.html" class="pub-link pub-link-blog">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            all publications
+          </a>
+        </div>
+      </div>
+
+      <!-- If this post is about a paper, add this -->
+      <!--
+      <div class="paper-callout">
+        <span class="mono">// related paper</span>
+        <p><strong>Paper Title</strong> · Venue, Year</p>
+        <div class="pub-links">
+          <a href="../publications.html" class="pub-link">see publications →</a>
+        </div>
+      </div>
+      -->
+    </article>
+
+    <div class="post-footer">
+      <a href="../blog.html" class="back-link mono">← all posts</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

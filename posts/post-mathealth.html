@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Woman Dies in Childbirth Every Fifteen Minutes · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/post.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">home</a></li>
+      <li><a href="../blog.html" class="nav-link active">blog</a></li>
+      <li><a href="../publications.html" class="nav-link">publications</a></li>
+      <li><a href="../resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="post-main">
+    <div class="post-header">
+      <a href="../blog.html" class="back-link mono">← back to blog</a>
+      <div class="post-meta-header">
+        <span class="post-date mono">July 2020</span>
+        <div class="post-tags">
+          <span class="tag-pill">machine learning</span>
+          <span class="tag-pill">research</span>
+        </div>
+      </div>
+      <h1 class="post-heading">A Woman Dies in Childbirth Every Fifteen Minutes</h1>
+      <p class="post-lede">
+        On working with ARMMAN and Google AI to predict which women were about to stop picking up the phone — and why that mattered more than it sounds.
+      </p>
+    </div>
+
+    <article class="post-content">
+
+      <p>
+        That statistic is from India alone. A woman dies in childbirth every fifteen minutes, and the WHO estimates India accounts for roughly 12% of all maternal deaths worldwide. The majority are preventable. Not because the medicine doesn't exist, but because the information doesn't reach the people who need it.
+      </p>
+
+      <p>
+        This is the problem ARMMAN has been chipping away at since 2008. Their program mMitra sends free, timed voice calls to enrolled women throughout pregnancy and up to a year after childbirth — 141 messages in total, in the woman's chosen language, at a time she picks. It's reached over 2 million women. It's been shown to actually move health parameters in the right direction.
+      </p>
+
+      <p>
+        The problem: a lot of women stop picking up.
+      </p>
+
+      <h2>The Real Problem Is Attrition</h2>
+
+      <p>
+        When a woman stops engaging with mMitra, she doesn't send a cancellation email. She just gradually stops answering. Maybe life gets in the way. Maybe she moved. Maybe the calls started arriving at the wrong time. The program keeps calling, but nobody picks up, and the health information that could've mattered goes unheard.
+      </p>
+
+      <p>
+        ARMMAN has health workers who can intervene — make a personal call, send a reminder, connect a woman with a counselor. But there are over 300,000 women in the program. You can't intervene with everyone. You need to know <em>who to call</em>.
+      </p>
+
+      <p>
+        That's the problem we were asked to solve. Working with ARMMAN and Google Research India, our job was to build models that could flag women at risk of dropping out before they actually did — early enough for an intervention to still matter.
+      </p>
+
+      <h2>The Data</h2>
+
+      <p>
+        We had access to anonymized call records for 329,489 women registered in 2018, amounting to over 70 million individual call log entries. Each entry told us whether a call was attempted, whether it connected, and how long it lasted. On top of that, we had demographic information collected at registration: age, education level, income group, language, gestation age, preferred call time.
+      </p>
+
+      <p>
+        A quick note on the data that took some working through: not every call failure means the woman ignored it. Network failures look identical to a missed call in the logs. And for every failed call, the program retries up to twice. We collapsed all of these into the best outcome per message — longest call duration — which reduced the dataset from 70 million rows to a more manageable 27 million. We also drew a line at 30 seconds: anything shorter than that we didn't count as a real engagement, just a connected-but-not-really.
+      </p>
+
+      <p>
+        So: <strong>attempt</strong> means a call was made, <strong>connection</strong> means someone picked up, <strong>engagement</strong> means they stayed on for at least 30 seconds. Three distinct things that look deceptively similar in the raw logs.
+      </p>
+
+      <h2>Two Different Problems</h2>
+
+      <p>
+        We framed this as two separate prediction tasks, because the interventions are different.
+      </p>
+
+      <p>
+        The first is <strong>short-term dropout prediction</strong>: given the last four weeks of a woman's call history, will she engage with any calls in the next two weeks? This is the "call her now" signal — the kind of flag that tells a health worker to make a personal check-in this week.
+      </p>
+
+      <p>
+        The second is <strong>long-term dropout prediction</strong>: given the first two months after registration, is this woman likely to disengage over the following six-plus months? This is the "she needs a counselor" signal — the kind of early warning that lets you plan a more sustained intervention.
+      </p>
+
+      <p>
+        For the long-term task, we also split it further: are we predicting low engagement-to-connection ratio (she connects but doesn't actually listen) or low connection-to-attempt ratio (she's barely picking up at all)? These are different problems with different likely causes.
+      </p>
+
+      <h2>The Models: CoNDiP and ReNDiP</h2>
+
+      <p>
+        Yes, we named them. It's a prerogative of grad school.
+      </p>
+
+      <p>
+        The core challenge was combining two kinds of information: static demographics (collected once at registration) and sequential call history (a time series of variable length). A random forest over demographics alone was our baseline — it got 70% accuracy and an AUC of 0.83. Decent, but it was ignoring most of the signal.
+      </p>
+
+      <p>
+        <strong>CoNDiP</strong> (Convolutional Neural Disengagement Predictor) encodes the call history using 1D convolutions — think of it as learning local temporal patterns in the sequence, like "three misses in a row" or "engagement dropping off over two weeks." The demographic features go through a separate feedforward network, and then both encodings get concatenated and fed into a final classification head.
+      </p>
+
+      <p>
+        <strong>ReNDiP</strong> (Recurrent Neural Disengagement Predictor) swaps the convolutional layers for a bidirectional LSTM, which reads the call sequence in both directions and captures longer-range dependencies. The rest of the architecture is the same.
+      </p>
+
+      <p>
+        For short-term prediction, CoNDiP won: 83% accuracy, AUC of 0.908, versus 0.831 for the random forest. The convolutional approach was better at picking up on the recent local pattern — "she stopped answering three weeks ago" — which is exactly the kind of signal that matters for short-term risk.
+      </p>
+
+      <p>
+        For long-term prediction, ReNDiP pulled ahead slightly. Makes sense: predicting behavior over six months requires understanding the arc of a woman's engagement over the first two months, not just the last week. The LSTM was better at capturing that trajectory.
+      </p>
+
+      <div class="callout-box">
+        <span class="mono callout-label">// the headline numbers</span>
+        <p>
+          Short-term: CoNDiP achieves <strong>83% accuracy, 85% recall</strong> on high-risk women — a 13% improvement over the random forest baseline.<br /><br />
+          Long-term: ReNDiP achieves <strong>76% accuracy</strong> — 7% better than baseline, and in the pilot deployment, rising to 84% as the model's predictions were validated against real behaviour.
+        </p>
+      </div>
+
+      <h2>Putting It in the Field</h2>
+
+      <p>
+        The part of this project I'm proudest of isn't the model numbers — it's that we actually deployed it.
+      </p>
+
+      <p>
+        We built a dashboard for ARMMAN's health workers: a simple interface showing each beneficiary's predicted dropout risk, so workers could prioritize who to call. The pilot ran on 18,766 women who registered in November 2019. We had real call logs to validate against, and the results held up — better than held up, actually. In the pilot, the model hit 84% accuracy at a "minimum 15 connections" threshold, compared to 76% during training.
+      </p>
+
+      <p>
+        Some of that improvement was a distribution shift: the November 2019 cohort happened to have a higher proportion of low-risk women, and the model was better at identifying those. But even controlling for that, the core finding stood — the model was genuinely useful in the field.
+      </p>
+
+      <p>
+        We also ran a pre-pandemic analysis separately (cutting off at March 10, 2020), because lockdowns obviously changed call behavior in ways that had nothing to do with maternal health engagement. The numbers held there too.
+      </p>
+
+      <h2>What I'd Say Honestly</h2>
+
+      <p>
+        This paper isn't the most technically ambitious thing I've worked on. The models are solid applications of existing deep learning methods — 1D CNNs and LSTMs weren't new ideas in 2020. The novelty is in the framing, the data pipeline, and the deployment. Taking a well-understood problem (churn prediction) and making it work in a domain with noisy call logs, no clear outcome labels, and real-world stakes is its own kind of hard.
+      </p>
+
+      <p>
+        What made this project stick with me is simpler than that. The gap between "a model that works on a held-out test set" and "a model that a health worker actually uses to make decisions" is enormous, and most ML research never crosses it. We crossed it, at least at pilot scale. Every high-risk prediction that led to a health worker making a call that kept a woman in the program is the whole point.
+      </p>
+
+      <p>
+        The bigger problem — figuring out not just who to intervene with, but <em>how</em> — is still open. The paper gestures at reinforcement learning as a next step, using intervention data to learn optimal sequences of outreach. 
+      </p>
+
+      <div class="paper-callout">
+        <span class="mono">// paper</span>
+        <p>
+          <strong>Missed calls, Automated Calls and Health Support: Using AI to improve maternal health outcomes by increasing program engagement</strong><br />
+          Siddharth Nishtala, Harshavardhan Kamarthi, Divy Thakkar, et al.<br />
+          ARMMAN &amp; Google Research India · IIT Madras · arXiv:2006.07590
+        </p>
+        <div class="pub-links">
+          <a href="https://arxiv.org/abs/2006.07590" target="_blank" class="pub-link">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            arXiv
+          </a>
+          <a href="../publications.html" class="pub-link pub-link-blog">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            all publications
+          </a>
+        </div>
+      </div>
+
+    </article>
+
+    <div class="post-footer">
+      <a href="../blog.html" class="back-link mono">← all posts</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

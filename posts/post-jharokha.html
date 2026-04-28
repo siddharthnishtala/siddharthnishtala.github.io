@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jharokha · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/post.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">home</a></li>
+      <li><a href="../blog.html" class="nav-link active">blog</a></li>
+      <li><a href="../publications.html" class="nav-link">publications</a></li>
+      <li><a href="../resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="post-main">
+    <div class="post-header">
+      <a href="../blog.html" class="back-link mono">← back to blog</a>
+      <div class="post-meta-header">
+        <span class="post-date mono">April 2026</span>
+        <div class="post-tags">
+          <span class="tag-pill">project</span>
+        </div>
+      </div>
+      <h1 class="post-heading">Jharokha (झरोखा): Building a Photo Library That Doesn’t Own Your Photos</h1>
+      <p class="post-lede">
+        My rationale for building myself a photo library and some learnings from the process.
+      </p>
+    </div>
+
+    <article class="post-content">
+      <p>
+        I’ve always been someone who likes to <strong>build, break, and understand things</strong>. Usually, that means deploying anti-fraud models or tinkering with LLMs, but recently, I hit a very domestic wall: the "Cloud Storage Full" notification. I wanted the slick experience of Google Photos—natural language search, face grouping, and timeline views—without the recurring subscription or the feeling that my memories were being held hostage.
+      </p>
+      <p>
+        So, I built <strong>Jharokha (झरोखा)</strong>. It’s a self-hosted photo management app designed to index my library exactly where it lives—on my external drives and Mac—without moving files or charging a premium for the privilege.
+        More than just solving a storage problem, I started this project because I wanted to learn and get my hands dirty with a full-stack architecture.
+      </p>
+
+      <img src="../assets/img/posts/jharokha/jharokha.png" style="width:100%; height:auto;">
+
+      <h2>Design Constraint: Offline-First Browsing</h2>
+      <p>
+            A subtle but important constraint of my setup is that my external hard drive isn’t always connected. I wanted to ensure that my browsing experience didn't break just because I was on the move.
+        </p>
+        <p>
+            To solve this, Jharokha generates <strong>local WebP thumbnails</strong> stored directly on my Mac. This means I can scroll through my entire timeline and see every memory even when the "source of truth" drive is sitting on my desk at home. The metadata remains accessible, and the app is smart enough to know its limits: while I can browse anytime, I can only perform "heavy" actions like deleting pictures or exporting originals when the drive is physically connected. It’s a clean way to keep the library maintained without risking de-syncs.
+        </p>
+
+      <h2>The Architecture: Python, Svelte, and "No-Move" Indexing</h2>
+      <p>
+        The core philosophy of Jharokha is that it's a <em>referenced</em> library. Unlike traditional apps that import and duplicate your photos, Jharokha simply indexes them using <strong>SHA256 hashes</strong> as identities. This means if I have a duplicate, it's flagged by content, not filename.
+      </p>
+      <ul>
+        <li><strong>The Backend:</strong> Built with <strong>FastAPI</strong> and <strong>SQLAlchemy</strong>. It handles the heavy lifting—extracting EXIF data, reverse geocoding, and managing the SQLite database.</li>
+        <li><strong>The Frontend:</strong> A dense, "app-like" UI built with <strong>Svelte 5</strong> and <strong>Tailwind CSS</strong>. I used a justified row grid (think Apple Photos) that preserves aspect ratios without awkward cropping.</li>
+        <li><strong>The Pipeline:</strong> A robust ingestion system that handles everything from HEIC files to the messy sidecar JSONs you get from a Google Takeout dump. For photos with GPS coordinates, I use the <strong>Nominatim API</strong> (via geopy) to reverse-geocode the location, storing everything from the neighborhood to the country in a local SQLite cache.</li>
+      </ul>
+
+      <p>
+        This was my first time using <strong>Poetry</strong> for dependency management, and it’s been a revelation; the deterministic builds and clean CLI have convinced me to move all my future projects to it.
+      </p>
+
+      <h2>Adding the "Magic": Semantic Search & ML</h2>
+      <p>
+        A photo library is only as good as its search bar. I started with filename, location and time-based search, but I wanted to see what's possible with semantic search. I integrated <strong>CLIP via HuggingFace</strong> to enable semantic search.
+      </p>
+      <p>
+        By generating vector embeddings and storing them in <strong>ChromaDB</strong>, I can search for things like <em>"scuba diving"</em> or <em>"cricket match under stadium lights"</em>. The backend uses cosine similarity to find the best matches, returning results that traditional EXIF metadata would never catch.
+      </p>
+      <p>
+        However, working with CLIP in a production-like setting was a reality check. While it enables some incredibly cool searches, it is far from perfect—it can be temperamental with specific queries. It’s an area I’m excited to dig deeper into as I refine the models.
+      </p>
+
+      <h2>Solving the "Apple Problem"</h2>
+      <p>
+        One of the most satisfying parts of this project was "breaking" the problem of Live Photos and video timestamps. macOS and iOS often create <code>._</code> AppleDouble files or weird UTC offsets in video containers. I wrote custom scripts to pair <code>.heic</code> stills with their <code>.mov</code> counterparts, ensuring they share the same metadata and chronological spot in my timeline.
+      </p>
+
+      <h2>What’s Next?</h2>
+      <p>
+        Jharokha is currently in a "functional MVP" state. I’m using it to manage a real library with over 5k photos. Next on the terminal? Implementing face recognition, a memories feature for daily and weekly reminders, and eventually packaging it with <strong>Tauri</strong> to make it a true desktop experience.
+      </p>
+      <p>
+        It’s a work in progress, just like all of us.
+      </p>
+
+      <p>
+        The code for the project can be found <a href="https://github.com/siddharthnishtala/jharokha" target="_blank">here</a>.
+      </p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résumé · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">home</a></li>
+      <li><a href="blog.html" class="nav-link">blog</a></li>
+      <li><a href="publications.html" class="nav-link">publications</a></li>
+      <li><a href="resume.html" class="nav-link active">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="page-main">
+    <div class="page-header resume-header">
+      <div>
+        <p class="hero-eyebrow">the official one</p>
+        <h1 class="page-title">Résumé</h1>
+      </div>
+      <a href="assets/resume.pdf" download class="download-btn mono">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        download pdf
+      </a>
+    </div>
+
+    <div class="pdf-container">
+      <iframe
+        src="assets/resume.pdf"
+        class="pdf-embed"
+        title="Siddharth Nishtala — Résumé"
+        type="application/pdf"
+      ></iframe>
+      <div class="pdf-fallback">
+        <p class="mono">// PDF viewer not supported in this browser.</p>
+        <a href="assets/resume.pdf" class="download-btn mono" style="margin-top: 1rem; display: inline-flex;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          open / download pdf
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

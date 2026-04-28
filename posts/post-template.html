@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Title · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/post.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html" class="nav-link">home</a></li>
+      <li><a href="../blog.html" class="nav-link active">blog</a></li>
+      <li><a href="../publications.html" class="nav-link">publications</a></li>
+      <li><a href="../resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="post-main">
+    <div class="post-header">
+      <a href="../blog.html" class="back-link mono">← back to blog</a>
+      <div class="post-meta-header">
+        <span class="post-date mono">January 2024</span>
+        <div class="post-tags">
+          <span class="tag-pill">machine learning</span>
+          <span class="tag-pill">project</span>
+        </div>
+      </div>
+      <h1 class="post-heading">Your Post Title Goes Here</h1>
+      <p class="post-lede">
+        A one or two sentence summary that will hook the reader. 
+        This appears prominently below the title.
+      </p>
+    </div>
+
+    <article class="post-content">
+      <p>
+        Start your post here. This template uses Lora for body text — 
+        a beautiful serif that's excellent for long-form reading. 
+        Write naturally; the CSS handles the rest.
+      </p>
+
+      <h2>A Section Heading</h2>
+      <p>
+        Body text flows nicely with generous line height and measure. 
+        You can use <strong>bold</strong>, <em>italics</em>, 
+        and <a href="#">links</a> naturally.
+      </p>
+
+      <p>
+        Use inline code with backtick-style spans: 
+        <code>model.fit(X_train, y_train)</code> looks crisp.
+      </p>
+
+      <pre><code># A code block for longer snippets
+import numpy as np
+import pandas as pd
+
+df = pd.read_csv('data.csv')
+print(df.describe())</code></pre>
+
+      <h2>Another Section</h2>
+      <p>
+        Add more sections as needed. Each <code>h2</code> creates a visible section break.
+        Use <code>h3</code> for sub-sections within a section.
+      </p>
+
+      <blockquote>
+        Use blockquotes for key insights, quotes from papers, 
+        or things you want to call out visually.
+      </blockquote>
+
+      <h2>Conclusion</h2>
+      <p>
+        Wrap up the post here. Link back to relevant papers on the publications page 
+        or to related blog posts.
+      </p>
+
+      <!-- If this post is about a paper, add this -->
+      <!--
+      <div class="paper-callout">
+        <span class="mono">// related paper</span>
+        <p><strong>Paper Title</strong> · Venue, Year</p>
+        <div class="pub-links">
+          <a href="../publications.html" class="pub-link">see publications →</a>
+        </div>
+      </div>
+      -->
+    </article>
+
+    <div class="post-footer">
+      <a href="../blog.html" class="back-link mono">← all posts</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

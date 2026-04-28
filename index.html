@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link active">home</a></li>
+      <li><a href="blog.html" class="nav-link">blog</a></li>
+      <li><a href="publications.html" class="nav-link">publications</a></li>
+      <li><a href="resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="home-main">
+    <section class="hero">
+      <div class="hero-text">
+        <!-- <p class="hero-eyebrow">hello, world</p> -->
+        <h1 class="hero-name">Siddharth<br /><em>Nishtala</em></h1>
+        <p class="hero-title">
+          <span class="mono">Senior Data Scientist at <a href="https://www.accertify.com" target="_blank"> Accertify </a></a></span>
+        </p>
+        <p class="hero-bio">
+          I like to build, break, and understand things. 
+          My work spans the spectrum of ML—from developing interpretable reinforcement learning at IIT Madras to deploying high-stakes anti-fraud models in industry. 
+          I’ve had the privilege of applying AI to real-world problems, like working with Google AI and ARMMAN on maternal health interventions.
+        </p>
+        <p class="hero-bio">
+          I’m currently focused on the frontier of LLMs and Agentic AI, but I’m happiest when I’m actually building things. 
+          Most recently, I created Jharokha (झरोखा)—a personal, self-hosted photo library built with FastAPI and Svelte to escape the cloud.
+        </p>
+        <p class="hero-bio">
+          When I’m not at the terminal, I’m usually reading my way through a long Goodreads list, catching up on the latest in Cricket, F1, and Tennis, or exploring a new hobby—most recently becoming a certified open water diver.
+        </p>
+        <div class="social-links">
+          <a href="mailto:siddharth.nishtala@gmail.com" class="social-link" title="Email">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>email</span>
+          </a>
+          <a href="https://linkedin.com/in/siddharth-nishtala" target="_blank" class="social-link" title="LinkedIn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+            <span>linkedin</span>
+          </a>
+          <a href="https://github.com/siddharthnishtala" target="_blank" class="social-link" title="GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+            <span>github</span>
+          </a>
+          <a href="https://scholar.google.com/citations?user=cwEnJxgAAAAJ" target="_blank" class="social-link" title="Google Scholar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <span>scholar</span>
+          </a>
+          <a href="https://www.goodreads.com/user/show/159827124-siddharth-nishtala" target="_blank" class="social-link" title="Goodreads">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            <span>goodreads</span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="avatar-container">
+          <div class="avatar-ring"></div>
+          <div class="avatar-placeholder">
+            <!-- <span class="mono">S<span class="accent">N</span></span> -->
+          </div>
+          <div class="floating-tags">
+            <span class="tag tag-1 mono">ml</span>
+            <span class="tag tag-2 mono">books</span>
+            <span class="tag tag-3 mono">python</span>
+            <span class="tag tag-4 mono">research</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- <section class="about-section">
+      <div class="section-label mono">// about</div>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-card-icon">⚗️</div>
+          <h3>Research</h3>
+          <p>Academic work in machine learning and NLP. I enjoy the slower, deeper kind of thinking that comes with trying to push the field forward.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🏭</div>
+          <h3>Industry</h3>
+          <p>Building real systems that handle real data at scale. Bridging the gap between what's theoretically elegant and what actually ships.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">📖</div>
+          <h3>Writing</h3>
+          <p>I write about my projects, ideas I'm chewing on, and things I've learned — usually the hard way. See the blog for the latest.</p>
+        </div>
+      </div>
+    </section> -->
+
+    <section class="recent-section">
+      <div class="section-label mono">// recent posts</div>
+      <div class="recent-posts">
+        <a href="blog.html" class="recent-post-card">
+          <span class="post-date mono">Apr 26</span>
+          <h4>Jharokha (झरोखा): Building a Photo Library That Doesn’t Own Your Photos</h4>
+          <span class="post-arrow">→</span>
+        </a>
+        <a href="blog.html" class="recent-post-card">
+          <span class="post-date mono">Jul 25</span>
+          <h4>Market Data Refinement: A Backtesting Stack to Simulate Strategies for Indian Equities</h4>
+          <span class="post-arrow">→</span>
+        </a>
+      </div>
+      <a href="blog.html" class="view-all-link mono">view all posts →</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog · Siddharth Nishtala</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">sn<span class="cursor-blink">_</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">home</a></li>
+      <li><a href="blog.html" class="nav-link active">blog</a></li>
+      <li><a href="publications.html" class="nav-link">publications</a></li>
+      <li><a href="resume.html" class="nav-link">résumé</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main class="page-main">
+    <div class="page-header">
+      <p class="hero-eyebrow">writing &amp; projects</p>
+      <h1 class="page-title">Blog</h1>
+      <p class="page-subtitle">
+        Notes on machine learning, data science, research, and the occasional tangent. 
+      </p>
+    </div>
+
+    <div class="filter-bar">
+      <span class="mono filter-label">filter:</span>
+      <button class="filter-btn active" data-filter="all">all</button>
+      <button class="filter-btn" data-filter="ml">machine learning</button>
+      <button class="filter-btn" data-filter="rl">reinforcement learning</button>
+      <button class="filter-btn" data-filter="project">project</button>
+      <button class="filter-btn" data-filter="research">research</button>
+      <button class="filter-btn" data-filter="misc">misc</button>
+    </div>
+
+    <div class="posts-list">
+
+      <article class="post-card" data-tags="project">
+        <div class="post-meta">
+          <span class="post-date mono">Apr 2026</span>
+          <div class="post-tags">
+            <span class="tag-pill">project</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-jharokha.html">Jharokha: Building a Photo Library That Doesn’t Own Your Photos</a>
+          </h2>
+          <p class="post-excerpt">
+            My rationale for building myself a photo library and some learnings from the process.
+          </p>
+          <a href="posts/post-jharokha.html" class="read-more mono">read more →</a>
+        </div>
+      </article>
+
+      <article class="post-card" data-tags="project">
+        <div class="post-meta">
+          <span class="post-date mono">Jul 2025</span>
+          <div class="post-tags">
+            <span class="tag-pill">project</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-mdr.html">Market Data Refinement: A Backtesting Stack to Simulate Strategies for Indian Equities</a>
+          </h2>
+          <p class="post-excerpt">
+            Details and learnings from my attempt at building a backtesting stack to simulate different strategies for picking Indian stocks.
+          </p>
+          <a href="posts/post-mdr.html" class="read-more mono">read more →</a>
+        </div>
+      </article>
+
+      <article class="post-card" data-tags="ml rl research">
+        <div class="post-meta">
+          <span class="post-date mono">Jan 2024</span>
+          <div class="post-tags">
+            <span class="tag-pill">machine learning</span>
+            <span class="tag-pill">reinforcement learning</span>
+            <span class="tag-pill">research</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-cstree.html">When Being Wrong Isn't Always the Same</a>
+          </h2>
+          <p class="post-excerpt">
+            On teaching decision trees to care about <em>how</em> they're wrong, not just <em>whether</em> they're wrong — and why that distinction quietly matters in reinforcement learning.</p>
+          <a href="posts/post-cstree.html" class="read-more mono">read more →</a>
+        </div>
+      </article>
+
+      <article class="post-card" data-tags="ml research">
+        <div class="post-meta">
+          <span class="post-date mono">Oct 2021</span>
+          <div class="post-tags">
+            <span class="tag-pill">machine learning</span>
+            <span class="tag-pill">reinforcement learning</span>
+            <span class="tag-pill">research</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-rmab.html">Not Just Who to Call — Who to Call First</a>
+          </h2>
+          <p class="post-excerpt">
+            Predicting dropout is the easy part. The harder problem is deciding, with limited time and people, which of the hundreds of at-risk women will actually benefit from a health worker picking up the phone.
+          </p>
+          <a href="posts/post-rmab.html" class="read-more mono">read more →</a>
+        </div>
+      </article>
+
+      <article class="post-card" data-tags="ml research">
+        <div class="post-meta">
+          <span class="post-date mono">Jul 2020</span>
+          <div class="post-tags">
+            <span class="tag-pill">machine learning</span>
+            <span class="tag-pill">research</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-mathealth.html">A Woman Dies in Childbirth Every Fifteen Minutes</a>
+          </h2>
+          <p class="post-excerpt">
+            On working with ARMMAN and Google AI to predict which women were about to stop picking up the phone — and why that mattered more than it sounds.
+          </p>
+          <a href="posts/post-mathealth.html" class="read-more mono">read more →</a>
+        </div>
+      </article>
+
+      <!-- ===== POST TEMPLATE — duplicate this block for each new post ===== -->
+      <!-- <article class="post-card" data-tags="ml project">
+        <div class="post-meta">
+          <span class="post-date mono">Jan 2024</span>
+          <div class="post-tags">
+            <span class="tag-pill">machine learning</span>
+            <span class="tag-pill">project</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <h2 class="post-title">
+            <a href="posts/post-template.html">Your Post Title Goes Here</a>
+          </h2>
+          <p class="post-excerpt">
+            A short description of what this post is about. Keep it to 2–3 sentences. 
+            Make it interesting enough that someone would actually want to click through.
+          </p>
+          <a href="posts/post-template.html" class="read-more mono">read more →</a>
+        </div>
+      </article> -->
+      <!-- ===== END POST TEMPLATE ===== -->
+
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none">
+      <span class="mono">// no posts match this filter</span>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p class="mono">built with ☕ &amp; curiosity · <a href="https://github.com/siddharthnishtala/siddharthnishtala.github.io" target="_blank">source</a></p>
+    <p class="mono footer-easter">
+      <span title="You found it!">rm -rf bugs/ 2>/dev/null || true</span>
+    </p>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
